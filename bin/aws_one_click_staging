@@ -1,0 +1,3 @@
+#!/usr/bin/env ruby
+
+require "aws_one_click_staging"
