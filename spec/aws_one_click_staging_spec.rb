@@ -5,7 +5,9 @@ describe AwsOneClickStaging do
     expect(AwsOneClickStaging::VERSION).not_to be nil
   end
 
-  it 'does something useful' do
+  it 'can read config files' do
+    a = AwsOneClickStaging::AwsWarrior.new
+    binding.pry
     expect(false).to eq(true)
   end
 end

@@ -1,3 +1,28 @@
 #!/usr/bin/env ruby
 
+require 'thor'
 require "aws_one_click_staging"
+
+class AwsOneClickStagingRunner < Thor
+
+  default_task :start
+
+  desc "list", "Shows help"
+  def list
+    AwsOneClickStaging.list
+  end
+
+  desc "stage", "Makes a copy of the RDS database and the staging server's S3 bucket.  This takes a while."
+  def stage
+    AwsOneClickStaging.stage(421)
+  end
+
+  desc "version", "Prints gem's version"
+  def version
+    AwsOneClickStaging::VERSION
+  end
+  map %w(-v --version) => :version
+
+end
+
+AwsOneClickStagingRunner.start
