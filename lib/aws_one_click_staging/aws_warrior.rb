@@ -6,41 +6,37 @@ module AwsOneClickStaging
 
     def initialize
       # read config file
-      @config_file = File.expand_path("~/.config/aws_one_click_staging.yml")
+      @config_dir = "#{ENV['HOME']}/.config"
+      @config_file = File.expand_path("#{@config_dir}/aws_one_click_staging.yml")
       config = read_config_file
       # make clone of RDS
 
       # make clone of bucket
     end
 
+    
+
     def read_config_file
-      create_config_file_if_needed!
+      return if create_config_file_if_needed!
       config = File.read(@config_file)
-
     end
 
     def create_config_file_if_needed!
-      return if File.exists?(@config_file)
-      puts "Config file not found, creating...\n"
+      return false if File.exists?(@config_file)
+      msg = ""
+      msg += "Config file not found, creating...\n\n"
+
       # copy example config file to config file path
-      example_config_file_source = File.expand_path("~/.config/aws_one_click_staging.yml")
-      binding.pry
-      FileUtils.cp("#{SOURCE_ROOT}/config/config", @config_file) unless File.exists? @config_file
+      FileUtils.mkdir_p @config_dir
+      FileUtils.cp("#{SOURCE_ROOT}/config/aws_one_click_staging.yml", @config_file)
 
+      msg += "An empty config file was created for you in #{@config_file}\n"
+      msg += "Please populate it with the correct information and run this \n"
+      msg += "command again.  \n"
 
+      true
 
-      puts "An empty config file was created for you in #{config_file_path}"
-      puts "Please populate it with the correct information and run this "
-      puts "command again.  "
-      exit
     end
-
-    def create_config_file_if_needed!
-      FileUtils.mkdir_p @user_defined_templates_path
-      FileUtils.cp("#{SOURCE_ROOT}/config/config", @config_file) unless File.exists? @config_file
-    end
-
-
 
   end
 
