@@ -8,6 +8,7 @@ module AwsOneClickStaging
 
   def self.stage
     warrior = AwsWarrior.new
+    return if warrior.nil?
     puts "cloning database from amazon... this takes a while..."
     warrior.clone_rds
     puts "cloning s3 bucket from amazon... this takes forever..."

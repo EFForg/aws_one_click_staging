@@ -10,6 +10,7 @@ module AwsOneClickStaging
       # read config file
       @config_dir = "#{ENV['HOME']}/.config"
       @config_file = File.expand_path("#{@config_dir}/aws_one_click_staging.yml")
+      return nil if create_config_file_if_needed!
       @config = YAML.load(read_config_file)
     end
 
@@ -114,7 +115,6 @@ module AwsOneClickStaging
 
 
     def read_config_file
-      return if create_config_file_if_needed!
       config = File.read(@config_file)
     end
 
