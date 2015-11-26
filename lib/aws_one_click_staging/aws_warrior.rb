@@ -12,12 +12,11 @@ module AwsOneClickStaging
       @config_file = File.expand_path("#{@config_dir}/aws_one_click_staging.yml")
       return nil if create_config_file_if_needed!
       @config = YAML.load(read_config_file)
+      setup_aws_credentials_and_configs
     end
 
     def clone_rds
-      setup_aws_credentials
-
-      @c = Aws::RDS::Client.new
+      setup_aws_credentials_and_configs
 
       delete_snapshot_for_staging!
       create_new_snapshot_for_staging!
@@ -27,7 +26,7 @@ module AwsOneClickStaging
     end
 
     def clone_s3_bucket
-      setup_aws_credentials
+      setup_aws_credentials_and_configs
 
       from_creds = { aws_access_key_id: @access_key_id,
         aws_secret_access_key: @secret_access_key,
@@ -44,6 +43,8 @@ module AwsOneClickStaging
     end
 
     def get_fancy_string_of_staging_db_uri
+      setup_aws_credentials_and_configs
+      
       l = 66
       msg = ""
       msg += "*" * l + "\n"
@@ -54,10 +55,9 @@ module AwsOneClickStaging
       msg
     end
 
-
     private
 
-    def setup_aws_credentials
+    def setup_aws_credentials_and_configs
       aws_region = @config["aws_region"]
       @access_key_id = @config["aws_access_key_id"]
       @secret_access_key = @config["aws_secret_access_key"]
@@ -72,6 +72,8 @@ module AwsOneClickStaging
 
       Aws.config.update({ region: aws_region,
         credentials: Aws::Credentials.new(@access_key_id, @secret_access_key) })
+
+      @c = Aws::RDS::Client.new
     end
 
     def delete_snapshot_for_staging!

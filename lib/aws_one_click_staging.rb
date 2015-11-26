@@ -14,7 +14,7 @@ module AwsOneClickStaging
     puts "cloning s3 bucket from amazon... this takes forever..."
     warrior.clone_s3_bucket
 
-    puts get_fancy_string_of_staging_db_uri
+    puts warrior.get_fancy_string_of_staging_db_uri
 
     puts "\nOperations completed successfully!"
   end
@@ -24,6 +24,33 @@ module AwsOneClickStaging
     puts "This command *would* test that you have the needed permissions on the "
     puts "buckets and rds instances you named in your config file... "
     puts "but alas, you're reading the outputs of a stubbed method..."
+  end
+
+  def self.just_s3
+    warrior = AwsWarrior.new
+    return if warrior.nil?
+
+    puts "cloning s3 bucket from amazon... this takes forever..."
+    warrior.clone_s3_bucket
+    puts "\nOperations completed successfully!"
+
+  end
+
+  def self.just_rds
+    warrior = AwsWarrior.new
+    return if warrior.nil?
+
+    puts "cloning database from amazon... this takes a while..."
+    warrior.clone_rds
+
+    puts warrior.get_fancy_string_of_staging_db_uri
+
+    puts "\nOperations completed successfully!"
+  end
+
+  def self.just_ec2
+    warrior = AwsWarrior.new
+    puts "this is a stub because we only did this one time and don't feel need to repeat."
   end
 
 end

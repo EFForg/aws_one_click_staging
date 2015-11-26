@@ -32,6 +32,10 @@ describe AwsOneClickStaging do
     it 'can clone a bitbucket' do
       #@aws_warrior.clone_s3_bucket
     end
+
+    it 'can figure out an aws RDS URL' do
+      #puts @aws_warrior.get_fancy_string_of_staging_db_uri
+    end
   end
 
 end

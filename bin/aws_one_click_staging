@@ -16,6 +16,21 @@ class AwsOneClickStagingRunner < Thor
     AwsOneClickStaging.stage
   end
 
+  desc "just_rds", "Just clones the RDS part of things."
+  def just_rds
+    AwsOneClickStaging.just_rds
+  end
+
+  desc "just_s3", "Just clones the s3 part of things."
+  def just_s3
+    AwsOneClickStaging.just_s3
+  end
+
+  desc "just_ec2", "Just clones the ec2 part of things."
+  def just_ec2
+    AwsOneClickStaging.just_ec2
+  end
+
   desc "version", "Prints gem's version"
   def version
     AwsOneClickStaging::VERSION
