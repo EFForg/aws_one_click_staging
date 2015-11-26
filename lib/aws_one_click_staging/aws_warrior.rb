@@ -24,7 +24,6 @@ module AwsOneClickStaging
 
       delete_staging_db_instance!
       spawn_new_staging_db_instance!
-      print_staging_db_uri
     end
 
     def clone_s3_bucket
@@ -38,8 +37,21 @@ module AwsOneClickStaging
         bucket: @aws_staging_bucket}
 
       bs = BucketSyncService.new(from_creds, to_creds)
-      #bs.debug = true
+      bs.debug = true
+
+      puts "beginning clone of S3 bucket, this can go on for tens of minutes..."
       bs.perform
+    end
+
+    def get_fancy_string_of_staging_db_uri
+      l = 66
+      msg = ""
+      msg += "*" * l + "\n"
+      msg += "* "
+      msg += get_fresh_db_instance_state(@db_instance_id_staging).endpoint.address
+      msg += "  *\n"
+      msg += "*" * l
+      msg
     end
 
 
@@ -73,7 +85,7 @@ module AwsOneClickStaging
     end
 
     def create_new_snapshot_for_staging!
-      puts "creating new snapshot... this takes like 70 seconds..."
+      puts "creating new snapshot... this takes like 170 seconds..."
       response = @c.create_db_snapshot({db_instance_identifier: @db_instance_id_production,
         db_snapshot_identifier: @db_snapshot_id })
 
@@ -85,6 +97,7 @@ module AwsOneClickStaging
 
 
     def delete_staging_db_instance!
+      puts "Deleting old staging instance... This one's a doozy =/"
       response = @c.delete_db_instance(db_instance_identifier: @db_instance_id_staging,
         skip_final_snapshot: true)
 
@@ -94,6 +107,7 @@ module AwsOneClickStaging
     end
 
     def spawn_new_staging_db_instance!
+      puts "Spawning a new fully clony RDS db instance for staging purposes"
       response = @c.create_db_instance(db_instance_identifier: @db_instance_id_staging,
         db_instance_class: "db.t1.micro",
         engine: "postgres",
@@ -121,16 +135,7 @@ module AwsOneClickStaging
       true
     end
 
-    def print_staging_db_uri
-      l = 65
-      msg = ""
-      msg += "*" * l + "\n"
-      msg += "* "
-      msg += get_fresh_db_instance_state(@db_instance_id_staging).endpoint.address
-      msg += "  *\n"
-      msg += "*" * l
-      puts msg
-    end
+
 
 
     def read_config_file

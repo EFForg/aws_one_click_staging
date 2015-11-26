@@ -4,15 +4,14 @@ require 'thor'
 require "aws_one_click_staging"
 
 class AwsOneClickStagingRunner < Thor
+  default_task :help
 
-  default_task :start
-
-  desc "check", "Checks if your ~/.config/aws_one_click_staging.yml for validity"
+  desc "check", "Checks your ~/.config/aws_one_click_staging.yml for validity"
   def check
     AwsOneClickStaging.check
   end
 
-  desc "stage", "Makes a copy of the RDS database and the staging server's S3 bucket.  This takes a while."
+  desc "stage", "Makes a copy of the RDS database and the staging server's S3 bucket.  This takes a while.  Run on an Amazon shell!"
   def stage
     AwsOneClickStaging.stage
   end

@@ -4,6 +4,7 @@ AwsOneClickStaging is a CLI app that will allow you to create a clone of amazon'
 
 If you didn't already know, S3 is a file storage solution offered by Amazon, and it's not user friendly so you pretty much need to write/ use a script like this in order to setup a staging server.  RDS is Amazon's database storage.  As with all amazon services, RDS databases are in the clown so you can rely on it working well with your app and working hard to provide your users with hillarious service.  
 
+
 ## Installation
 
 Run this code (you need ruby) to install:
@@ -40,10 +41,11 @@ aws_one_click_staging stage
 
 After a while, the operation will complete and it will say 'congrats' or something and output the RDS url and bucket name for the staging clone.  Plug those values into your staging server and you should be good to go.  
 
+
 ## AWS Permissions
 
 Because you're a professional, you want to grant only the permissions absolutely necessary to the 'staging-bot' user.  
-That's commendable.  Use the below scripts and replace `PRODUCTIONDB` with the name of your production database/ s3 bucket (hopefully you used the same name for both).
+That's commendable.  Use the below scripts and replace `PRODUCTIONDB` with the name of your production database/ s3 bucket (hopefully you used the same name for both).  These rules are set via the `Identity & Access Management` subconsole on amazon.  
 
 (staging-bot-rds-can-do-anything-to-staging-db)
 ```
@@ -151,7 +153,8 @@ That's commendable.  Use the below scripts and replace `PRODUCTIONDB` with the n
                 "s3:ListMultipartUploadParts"
             ],
             "Resource": [
-                "arn:aws:s3:::PRODUCTIONDB"
+                "arn:aws:s3:::PRODUCTIONDB",
+                "arn:aws:s3:::PRODUCTIONDB/*"
             ]
         }
     ]

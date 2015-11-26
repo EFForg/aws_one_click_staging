@@ -14,15 +14,16 @@ module AwsOneClickStaging
     puts "cloning s3 bucket from amazon... this takes forever..."
     warrior.clone_s3_bucket
 
-    puts "operations completed successfully!"
+    puts get_fancy_string_of_staging_db_uri
+
+    puts "\nOperations completed successfully!"
   end
 
   def self.check
     warrior = AwsWarrior.new # this makes a config file if needed
-    puts "This command *would* test that you have the needed "
-    puts "permissions on the buckets and rds instances you named "
-    puts "in your config file... but alas, you're reading the "
-    puts "outputs of a stubbed method..."
+    puts "This command *would* test that you have the needed permissions on the "
+    puts "buckets and rds instances you named in your config file... "
+    puts "but alas, you're reading the outputs of a stubbed method..."
   end
 
 end
