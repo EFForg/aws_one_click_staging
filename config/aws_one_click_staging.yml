@@ -1,12 +1,9 @@
 # edit these values to match that of your production machine
 # which will be cloned from
-aws_access_key_id: ''
-aws_secret_access_key: ''
+aws_access_key_id: ""
+aws_secret_access_key: ""
 aws_region: 'us-west-1'
-aws_bucket: ''
-database: <%= ENV['RDS_DB_NAME'] %>
-db_host: <%= ENV['RDS_HOSTNAME'] %>
-db_port: '5432'
-db_password: ''
-username: <%= ENV['RDS_USERNAME'] %>
-password: <%= ENV['RDS_PASSWORD'] %>
+aws_master_username: ""
+aws_master_user_password: ""
+aws_production_bucket: "" # this bucket is read from
+aws_staging_bucket: ""    # this bucket is DELETED and written to!

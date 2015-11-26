@@ -1,4 +1,5 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+require "pry"
 require 'aws_one_click_staging'
 
 # let the app know we're testing, don't STDOUT

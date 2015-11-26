@@ -16,13 +16,13 @@ Next you'll need to setup the config file:
 
 (~/.config/aws_one_click_staging.yml)
 ```
-aws_access_key_id: ''
-aws_secret_access_key: ''
+aws_access_key_id: ""
+aws_secret_access_key: ""
 aws_region: 'us-west-1'
-aws_bucket: ''
-db_host: ''
-db_port: '5432'
-db_password: ''
+aws_master_username: ""
+aws_master_user_password: ""
+aws_production_bucket: "" # this bucket is read from
+aws_staging_bucket: ""    # this bucket is DELETED and written to!
 ```
 
 
@@ -31,7 +31,7 @@ db_password: ''
 Because amazon services are kind of a mess right now, it's best to run this from on an actual Amazon server you have shell access to (it downloads the bucket files and then re-uploads them, lol).
 
 ```
-aws_one_click_staging stage 
+aws_one_click_staging stage
 ```
 
 After a while, the operation will complete and it will say 'congrats' or something and output the RDS url and bucket name for the staging clone.  Plug those values into your staging server and you should be good to go.  

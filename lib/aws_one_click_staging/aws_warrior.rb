@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'aws-sdk'
+require 'yaml'
 
 module AwsOneClickStaging
 
@@ -9,26 +10,18 @@ module AwsOneClickStaging
       # read config file
       @config_dir = "#{ENV['HOME']}/.config"
       @config_file = File.expand_path("#{@config_dir}/aws_one_click_staging.yml")
-      config = read_config_file
+      @config = YAML.load(read_config_file)
     end
 
     def clone_rds
-      
+      setup_aws_credentials
 
       @db_instance_id_production = "actioncenter-staging"
       @db_instance_id_staging = "actioncenter-staging-test"
       @db_snapshot_id = "actioncenter-snapshot-for-staging"
 
-      Aws.config.update({ region: aws_region,
-        credentials: Aws::Credentials.new(access_key_id, secret_access_key) })
-
       @c = Aws::RDS::Client.new
 
-
-      binding.pry
-      exit
-
-      # Delete snapshot if it exists?
       delete_snapshot_for_staging!
       create_new_snapshot_for_staging!
 
@@ -36,10 +29,37 @@ module AwsOneClickStaging
       spawn_new_staging_db_instance!
     end
 
-    def self.clone_s3_bucket
+    def clone_s3_bucket
+      setup_aws_credentials
 
+      from_creds = { aws_access_key_id: @access_key_id,
+        aws_secret_access_key: @secret_access_key,
+        bucket: @aws_production_bucket}
+      to_creds = { aws_access_key_id: @access_key_id,
+        aws_secret_access_key: @secret_access_key,
+        bucket: @aws_staging_bucket}
+
+      bs = BucketSyncService.new(from_creds, to_creds)
+
+      bs.perform
     end
 
+
+    private
+
+    def setup_aws_credentials
+      @config[""]
+      aws_region = @config["aws_region"]
+      @access_key_id = @config["aws_access_key_id"]
+      @secret_access_key = @config["aws_secret_access_key"]
+      @master_username = @config["aws_master_username"]
+      @master_user_password = @config["aws_master_user_password"]
+      @aws_production_bucket = @config["aws_production_bucket"]
+      @aws_staging_bucket = @config["aws_staging_bucket"]
+
+      Aws.config.update({ region: aws_region,
+        credentials: Aws::Credentials.new(@access_key_id, @secret_access_key) })
+    end
 
     def delete_snapshot_for_staging!
       puts "deleting old staging db snapshot"
