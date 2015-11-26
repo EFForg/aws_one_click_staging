@@ -23,6 +23,10 @@ aws_master_username: ""
 aws_master_user_password: ""
 aws_production_bucket: "" # this bucket is read from
 aws_staging_bucket: ""    # this bucket is DELETED and written to!
+
+db_instance_id_production: "actioncenter"           # this db_instance is read from
+db_instance_id_staging: "actioncenter-staging"      # this db_instance is DELETED and written to!
+db_snapshot_id: "actioncenter-snapshot-for-staging" # this db snapshot id is OVERWRITTEN
 ```
 
 

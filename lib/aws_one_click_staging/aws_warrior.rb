@@ -17,9 +17,7 @@ module AwsOneClickStaging
     def clone_rds
       setup_aws_credentials
 
-      @db_instance_id_production = "actioncenter-staging"
-      @db_instance_id_staging = "actioncenter-staging-test"
-      @db_snapshot_id = "actioncenter-snapshot-for-staging"
+
 
       @c = Aws::RDS::Client.new
 
@@ -49,7 +47,6 @@ module AwsOneClickStaging
     private
 
     def setup_aws_credentials
-      @config[""]
       aws_region = @config["aws_region"]
       @access_key_id = @config["aws_access_key_id"]
       @secret_access_key = @config["aws_secret_access_key"]
@@ -57,6 +54,10 @@ module AwsOneClickStaging
       @master_user_password = @config["aws_master_user_password"]
       @aws_production_bucket = @config["aws_production_bucket"]
       @aws_staging_bucket = @config["aws_staging_bucket"]
+
+      @db_instance_id_production = @config["db_instance_id_production"]
+      @db_instance_id_staging = @config["db_instance_id_staging"]
+      @db_snapshot_id = @config["db_snapshot_id"]
 
       Aws.config.update({ region: aws_region,
         credentials: Aws::Credentials.new(@access_key_id, @secret_access_key) })

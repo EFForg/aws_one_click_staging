@@ -1,9 +1,17 @@
 # edit these values to match that of your production machine
 # which will be cloned from
+
+# The aws user you set here should only have read access to the production
+# S3 bucket and Db instance to keep your production data safe and happy
 aws_access_key_id: ""
 aws_secret_access_key: ""
+
 aws_region: 'us-west-1'
 aws_master_username: ""
 aws_master_user_password: ""
 aws_production_bucket: "" # this bucket is read from
 aws_staging_bucket: ""    # this bucket is DELETED and written to!
+
+db_instance_id_production: "actioncenter"           # this db_instance is read from
+db_instance_id_staging: "actioncenter-staging"      # this db_instance is DELETED and written to!
+db_snapshot_id: "actioncenter-snapshot-for-staging" # this db snapshot id is OVERWRITTEN
