@@ -12,8 +12,8 @@ describe AwsOneClickStaging do
     expect(AwsOneClickStaging::VERSION).not_to be nil
   end
 
-  it 'can create config files' do
-    a = AwsOneClickStaging.list
+  it 'can check config files' do
+    a = AwsOneClickStaging.check
 
     expect(File.exists?("#{ENV['HOME']}/.config/aws_one_click_staging.yml")).to be true
   end

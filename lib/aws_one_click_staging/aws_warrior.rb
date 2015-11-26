@@ -17,8 +17,6 @@ module AwsOneClickStaging
     def clone_rds
       setup_aws_credentials
 
-
-
       @c = Aws::RDS::Client.new
 
       delete_snapshot_for_staging!
@@ -26,6 +24,7 @@ module AwsOneClickStaging
 
       delete_staging_db_instance!
       spawn_new_staging_db_instance!
+      print_staging_db_uri
     end
 
     def clone_s3_bucket
@@ -67,7 +66,7 @@ module AwsOneClickStaging
       puts "deleting old staging db snapshot"
       response = @c.delete_db_snapshot(db_snapshot_identifier: @db_snapshot_id)
 
-      sleep 1 while response.percent_progress != 100
+      sleep 1 while response.db_snapshot.percent_progress != 100
       true
     rescue
       false
@@ -86,9 +85,10 @@ module AwsOneClickStaging
 
 
     def delete_staging_db_instance!
-      response = @c.delete_db_instance(db_instance_identifier: @db_instance_id_staging)
+      response = @c.delete_db_instance(db_instance_identifier: @db_instance_id_staging,
+        skip_final_snapshot: true)
 
-      sleep 2 while response.percent_progress != 100
+      sleep 10 until db_instance_is_deleted?(@db_instance_id_staging)
     rescue
       false
     end
@@ -101,7 +101,7 @@ module AwsOneClickStaging
         master_user_password: @master_user_password,
         allocated_storage: "10")
 
-      sleep 10 while get_fresh_db_instance_state.db_instance_status != "available"
+      sleep 10 while get_fresh_db_instance_state(@db_instance_id_staging).db_instance_status != "available"
     end
 
 
@@ -110,8 +110,26 @@ module AwsOneClickStaging
       @c.describe_db_snapshots(db_snapshot_identifier: @db_snapshot_id).db_snapshots.first
     end
 
-    def get_fresh_db_instance_state
-      @c.describe_db_instances(db_instance_identifier: @db_instance_id_staging).db_instances.first
+    def get_fresh_db_instance_state(db_instance_id)
+      @c.describe_db_instances(db_instance_identifier: db_instance_id).db_instances.first
+    end
+
+    def db_instance_is_deleted?(db_instance_id)
+      @c.describe_db_instances(db_instance_identifier: db_instance_id).db_instances.first
+      false
+    rescue Aws::RDS::Errors::DBInstanceNotFound => e
+      true
+    end
+
+    def print_staging_db_uri
+      l = 65
+      msg = ""
+      msg += "*" * l + "\n"
+      msg += "* "
+      msg += get_fresh_db_instance_state(@db_instance_id_staging).endpoint.address
+      msg += "  *\n"
+      msg += "*" * l
+      puts msg
     end
 
 

@@ -11,5 +11,10 @@ ENV['HOME'] = "/tmp/aws_one_click_staging_mock_home"
 
 def reset_test_env
   FileUtils.rm_rf "#{@mocked_home}"
-  FileUtils.mkdir_p @mocked_home
+  FileUtils.mkdir_p "#{@mocked_home}/.config"
+
+  working_amazon_credentials_file = "#{SOURCE_ROOT}/config/aws_actual_fffing_secrets.yml"
+  if File.exists?(working_amazon_credentials_file)
+    FileUtils.cp(working_amazon_credentials_file, "#{@mocked_home}/.config/aws_one_click_staging.yml")
+  end
 end
