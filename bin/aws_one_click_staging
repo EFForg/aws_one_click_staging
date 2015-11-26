@@ -14,7 +14,7 @@ class AwsOneClickStagingRunner < Thor
 
   desc "stage", "Makes a copy of the RDS database and the staging server's S3 bucket.  This takes a while."
   def stage
-    AwsOneClickStaging.stage(421)
+    AwsOneClickStaging.stage
   end
 
   desc "version", "Prints gem's version"
