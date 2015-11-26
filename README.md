@@ -40,10 +40,131 @@ aws_one_click_staging stage
 
 After a while, the operation will complete and it will say 'congrats' or something and output the RDS url and bucket name for the staging clone.  Plug those values into your staging server and you should be good to go.  
 
+## AWS Permissions
+
+Because you're a professional, you want to grant only the permissions absolutely necessary to the 'staging-bot' user.  
+That's commendable.  Use the below scripts and replace `PRODUCTIONDB` with the name of your production database/ s3 bucket (hopefully you used the same name for both).
+
+(staging-bot-rds-can-do-anything-to-staging-db)
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1448499769000",
+            "Effect": "Allow",
+            "Action": [
+                "rds:*"
+            ],
+            "Resource": [
+                "arn:aws:rds:*:*:db:PRODUCTIONDB-staging"
+            ]
+        }
+    ]
+}
+```
+(staging-bot-rds-can-do-anything-to-staging-snapshot)
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1448518052000",
+            "Effect": "Allow",
+            "Action": [
+                "rds:*"
+            ],
+            "Resource": [
+                "arn:aws:rds:*:*:snapshot:PRODUCTIONDB-snapshot-for-staging"
+            ]
+        }
+    ]
+}
+```
+(staging-bot-rds-can-snapshot-production-db)
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1448517746000",
+            "Effect": "Allow",
+            "Action": [
+                "rds:CreateDBSnapshot"
+            ],
+            "Resource": [
+                "arn:aws:rds:*:*:db:PRODUCTIONDB"
+            ]
+        }
+    ]
+}
+```
+(staging-bot-s3-can-do-anything-to-staging-bucket)
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1448518841000",
+            "Effect": "Allow",
+            "Action": [
+                "s3:*"
+            ],
+            "Resource": [
+                "arn:aws:s3:::PRODUCTIONDB-staging",
+                "arn:aws:s3:::PRODUCTIONDB-staging/*"
+            ]
+        }
+    ]
+}
+```
+(staging-bot-s3-can-read-from-production-bucket)
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1448523618000",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetBucketAcl",
+                "s3:GetBucketCORS",
+                "s3:GetBucketLocation",
+                "s3:GetBucketLogging",
+                "s3:GetBucketNotification",
+                "s3:GetBucketPolicy",
+                "s3:GetBucketRequestPayment",
+                "s3:GetBucketTagging",
+                "s3:GetBucketVersioning",
+                "s3:GetBucketWebsite",
+                "s3:GetLifecycleConfiguration",
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:GetObjectTorrent",
+                "s3:GetObjectVersion",
+                "s3:GetObjectVersionAcl",
+                "s3:GetObjectVersionTorrent",
+                "s3:ListAllMyBuckets",
+                "s3:ListBucket",
+                "s3:ListBucketMultipartUploads",
+                "s3:ListBucketVersions",
+                "s3:ListMultipartUploadParts"
+            ],
+            "Resource": [
+                "arn:aws:s3:::PRODUCTIONDB"
+            ]
+        }
+    ]
+}
+```
+
 
 ## Development
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release` to create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+
+There's a couple unit tests with commented out method calls.  This was how I tested against amazon, simply uncomment a line, drop in a `binding.pry;exit!` and test/ debug what ever methods you think are messing up.  
+
 
 ## Contributing
 

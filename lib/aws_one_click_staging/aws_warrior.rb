@@ -38,7 +38,7 @@ module AwsOneClickStaging
         bucket: @aws_staging_bucket}
 
       bs = BucketSyncService.new(from_creds, to_creds)
-
+      #bs.debug = true
       bs.perform
     end
 
