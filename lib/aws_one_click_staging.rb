@@ -13,7 +13,7 @@ module AwsOneClickStaging
   end
 
   def self.list
-    warrior = AwsWarrior.new
+    warrior = AwsWarrior.new # this makes a config file if needed
     puts "This is aws_one_click_staging, use stage to set things up"
   end
 

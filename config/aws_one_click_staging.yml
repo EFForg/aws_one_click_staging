@@ -4,6 +4,9 @@ aws_access_key_id: ''
 aws_secret_access_key: ''
 aws_region: 'us-west-1'
 aws_bucket: ''
-db_host: ''
+database: <%= ENV['RDS_DB_NAME'] %>
+db_host: <%= ENV['RDS_HOSTNAME'] %>
 db_port: '5432'
 db_password: ''
+username: <%= ENV['RDS_USERNAME'] %>
+password: <%= ENV['RDS_PASSWORD'] %>

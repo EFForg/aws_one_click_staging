@@ -19,5 +19,17 @@ describe AwsOneClickStaging do
   end
 
 
+  describe 'AwsWarrior' do
+
+    before :each do
+      @aws_warrior = AwsOneClickStaging::AwsWarrior.new
+    end
+
+    it 'can clone an RDS database' do
+      @aws_warrior.clone_rds
+    end
+
+    it 'can clone a bitbucket'
+  end
 
 end

@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'aws-sdk'
 
 module AwsOneClickStaging
 
@@ -9,12 +10,88 @@ module AwsOneClickStaging
       @config_dir = "#{ENV['HOME']}/.config"
       @config_file = File.expand_path("#{@config_dir}/aws_one_click_staging.yml")
       config = read_config_file
-      # make clone of RDS
-
-      # make clone of bucket
     end
 
-    
+    def clone_rds
+      
+
+      @db_instance_id_production = "actioncenter-staging"
+      @db_instance_id_staging = "actioncenter-staging-test"
+      @db_snapshot_id = "actioncenter-snapshot-for-staging"
+
+      Aws.config.update({ region: aws_region,
+        credentials: Aws::Credentials.new(access_key_id, secret_access_key) })
+
+      @c = Aws::RDS::Client.new
+
+
+      binding.pry
+      exit
+
+      # Delete snapshot if it exists?
+      delete_snapshot_for_staging!
+      create_new_snapshot_for_staging!
+
+      delete_staging_db_instance!
+      spawn_new_staging_db_instance!
+    end
+
+    def self.clone_s3_bucket
+
+    end
+
+
+    def delete_snapshot_for_staging!
+      puts "deleting old staging db snapshot"
+      response = @c.delete_db_snapshot(db_snapshot_identifier: @db_snapshot_id)
+
+      sleep 1 while response.percent_progress != 100
+      true
+    rescue
+      false
+    end
+
+    def create_new_snapshot_for_staging!
+      puts "creating new snapshot... this takes like 70 seconds..."
+      response = @c.create_db_snapshot({db_instance_identifier: @db_instance_id_production,
+        db_snapshot_identifier: @db_snapshot_id })
+
+      sleep 10 while get_fresh_db_snapshot_state.status != "available"
+      true
+    rescue
+      false
+    end
+
+
+    def delete_staging_db_instance!
+      response = @c.delete_db_instance(db_instance_identifier: @db_instance_id_staging)
+
+      sleep 2 while response.percent_progress != 100
+    rescue
+      false
+    end
+
+    def spawn_new_staging_db_instance!
+      response = @c.create_db_instance(db_instance_identifier: @db_instance_id_staging,
+        db_instance_class: "db.t1.micro",
+        engine: "postgres",
+        master_username: @master_username,
+        master_user_password: @master_user_password,
+        allocated_storage: "10")
+
+      sleep 10 while get_fresh_db_instance_state.db_instance_status != "available"
+    end
+
+
+    # we use this methods cause amazon lawl-pain
+    def get_fresh_db_snapshot_state
+      @c.describe_db_snapshots(db_snapshot_identifier: @db_snapshot_id).db_snapshots.first
+    end
+
+    def get_fresh_db_instance_state
+      @c.describe_db_instances(db_instance_identifier: @db_instance_id_staging).db_instances.first
+    end
+
 
     def read_config_file
       return if create_config_file_if_needed!
@@ -35,7 +112,6 @@ module AwsOneClickStaging
       msg += "command again.  \n"
 
       true
-
     end
 
   end
