@@ -1,6 +1,7 @@
 # props to bantic
 # https://gist.github.com/bantic/4080793
 require 'aws/s3' # gem name is 'aws-sdk'
+require "thwait"
 
 class BucketSyncService
   attr_reader :from_bucket, :to_bucket, :logger
@@ -16,12 +17,16 @@ class BucketSyncService
   end
 
   def perform(output=STDOUT)
+    AWS.eager_autoload! # this makes threads even more happy
+
     object_counts = {sync:0, skip:0}
     create_logger(output)
 
+    threads = []
+
     logger.info "Starting sync."
     from_bucket.objects.each do |object|
-      result = Thread.new {
+      threads << Thread.new {
         if object_needs_syncing?(object)
           sync(object)
           object_counts[:sync] += 1
@@ -30,7 +35,12 @@ class BucketSyncService
           object_counts[:skip] += 1
         end
       }
+      sleep 0.01 while threads.select {|t| t.alive?}.count > 16
     end
+
+
+    ThreadsWait.all_waits(threads)
+
     logger.info "Done. Synced #{object_counts[:sync]}, " +
       "skipped #{object_counts[:skip]}."
   end
@@ -56,9 +66,9 @@ class BucketSyncService
 
   def object_needs_syncing?(object)
     to_object = to_bucket.objects[object.key]
-    return true if !to_object.exists?
+    return true if !to_object.exists? # object isn't even present in the dst bucket
 
-    return to_object.etag != object.etag
+    return to_object.etag != object.etag # does the etag on the dst object differ from src?
   end
 
   def get_bucket_reference(credentials)
@@ -74,6 +84,7 @@ class BucketSyncService
     bucket
   end
 end
+
 
 
 
