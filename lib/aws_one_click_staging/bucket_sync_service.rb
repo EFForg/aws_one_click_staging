@@ -21,13 +21,15 @@ class BucketSyncService
 
     logger.info "Starting sync."
     from_bucket.objects.each do |object|
-      if object_needs_syncing?(object)
-        sync(object)
-        object_counts[:sync] += 1
-      else
-        logger.debug "Skipped #{pp object}"
-        object_counts[:skip] += 1
-      end
+      result = Thread.new {
+        if object_needs_syncing?(object)
+          sync(object)
+          object_counts[:sync] += 1
+        else
+          logger.debug "Skipped #{pp object}"
+          object_counts[:skip] += 1
+        end
+      }
     end
     logger.info "Done. Synced #{object_counts[:sync]}, " +
       "skipped #{object_counts[:skip]}."
