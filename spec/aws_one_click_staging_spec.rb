@@ -36,6 +36,14 @@ describe AwsOneClickStaging do
     it 'can figure out an aws RDS URL' do
       #puts @aws_warrior.get_fancy_string_of_staging_db_uri
     end
+
+    it 'has a test section for work benching' do
+      # s3 = Aws::S3::Client.new
+      # s3.get_object_acl(bucket: 'actioncenter', key: 'images/000/000/008/original/jeffflake.jpeg')
+      # binding.pry
+      # exit
+      # o = s3.get_object(bucket: 'actioncenter', key: 'images/000/000/008/original/jeffflake.jpeg')
+    end
   end
 
 end

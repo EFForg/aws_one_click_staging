@@ -6,15 +6,13 @@ class BucketSyncService
   attr_reader :from_bucket, :to_bucket, :logger
   attr_accessor :debug
 
-  DEFAULT_ACL = :public_read
-
   # from_credentials and to_credentials are both hashes with these keys:
   #  * :aws_access_key_id
   #  * :aws_secret_access_key
   #  * :bucket
   def initialize(from_credentials, to_credentials)
-    @from_bucket = bucket_from_credentials(from_credentials)
-    @to_bucket   = bucket_from_credentials(to_credentials)
+    @from_bucket = get_bucket_reference(from_credentials)
+    @to_bucket   = get_bucket_reference(to_credentials)
   end
 
   def perform(output=STDOUT)
@@ -45,7 +43,7 @@ class BucketSyncService
 
   def sync(object)
     logger.debug "Syncing #{pp object}"
-    object.copy_to( to_bucket.objects[object.key], acl:DEFAULT_ACL)
+    object.copy_to(to_bucket.objects[object.key])
   end
 
   def pp(object)
@@ -61,14 +59,16 @@ class BucketSyncService
     return to_object.etag != object.etag
   end
 
-  def bucket_from_credentials(credentials)
+  def get_bucket_reference(credentials)
     s3 = AWS::S3.new(access_key_id:      credentials[:aws_access_key_id],
                      secret_access_key:  credentials[:aws_secret_access_key])
 
     bucket = s3.buckets[ credentials[:bucket] ]
-    if !bucket.exists?
-      bucket = s3.buckets.create( credentials[:bucket] )
-    end
+    create_bucket_if_needed!(bucket)
+  end
+
+  def create_bucket_if_needed!(bucket)
+    return s3.buckets.create( credentials[:bucket] ) if !bucket.exists?
     bucket
   end
 end
