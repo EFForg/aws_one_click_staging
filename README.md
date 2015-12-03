@@ -2,7 +2,7 @@
 
 AwsOneClickStaging is a CLI app that will allow you to create a clone of amazon's S3 bucket (named app_name-staging) and the RDS database (named app_name-staging) so your staging server will be 100% up to date with your production server and allow you to perform some serious testing without the fear of losing important files stored on your S3 bucket.  
 
-If you didn't already know, S3 is a file storage solution offered by Amazon, and it's not user friendly so you pretty much need to write/ use a script like this in order to setup a staging server.  RDS is Amazon's database storage.  As with all amazon services, RDS databases are in the clown so you can rely on it working well with your app and working hard to provide your users with hillarious service.  
+If you didn't already know, S3 is a file storage solution offered by Amazon, and it's not user friendly so you pretty much need to write/ use a script like this in order to setup a staging server.  RDS is Amazon's database storage.  As with all amazon services, RDS databases are in the clown so you can rely on it working well with your app and working hard to provide your users with hilarious service.  
 
 
 ## Installation
@@ -45,7 +45,7 @@ After a while, the operation will complete and it will say 'congrats' or somethi
 ## AWS Permissions
 
 Because you're a professional, you want to grant only the permissions absolutely necessary to the 'staging-bot' user.  
-That's commendable.  Use the below scripts and replace `PRODUCTIONDB` with the name of your production database/ s3 bucket (hopefully you used the same name for both).  These rules are set via the `Identity & Access Management` subconsole on amazon.  
+That's commendable.  Use the below rules, replacing `PRODUCTIONDB` with the name of your production database/ s3 bucket (hopefully you used the same name for both).  These rules are set via the `Identity & Access Management` subconsole on amazon.  
 
 (staging-bot-rds-can-do-anything-to-staging-db)
 ```
@@ -176,3 +176,8 @@ There's a couple unit tests with commented out method calls.  This was how I tes
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
+
+
+## Credits
+Cory Forsyth [Bantic](github.com/bantic) wrote the S3 synchronization code used by this gem.  
+rob@eff did the other stuff.  
