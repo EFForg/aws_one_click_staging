@@ -7,13 +7,18 @@ class BucketSyncService
   attr_reader :from_bucket, :to_bucket, :logger
   attr_accessor :debug
 
+  # DEFAULT_ACL = :public_read
+  # PRIVATE_ACL = :private
+
+
+
   # from_credentials and to_credentials are both hashes with these keys:
   #  * :aws_access_key_id
   #  * :aws_secret_access_key
   #  * :bucket
   def initialize(from_credentials, to_credentials)
-    @from_bucket = get_bucket_reference(from_credentials)
-    @to_bucket   = get_bucket_reference(to_credentials)
+    @from_bucket = bucket_from_credentials(from_credentials)
+    @to_bucket   = bucket_from_credentials(to_credentials)
   end
 
   def perform(output=STDOUT)
@@ -35,7 +40,7 @@ class BucketSyncService
           object_counts[:skip] += 1
         end
       }
-      sleep 0.01 while threads.select {|t| t.alive?}.count > 16
+      sleep 0.01 while threads.select {|t| t.alive?}.count > 16 # throttling
     end
 
 
@@ -55,7 +60,17 @@ class BucketSyncService
 
   def sync(object)
     logger.debug "Syncing #{pp object}"
-    object.copy_to(to_bucket.objects[object.key])
+    acl_setting = file_is_public?(object) ? :public_read : :private
+    object.copy_to(to_bucket.objects[object.key], acl: acl_setting)
+  end
+
+  # Crude, but ala aws I think :)
+  def file_is_public?(object)
+    grants = object.acl.grants
+    grants.each do |g|
+      return true if g.permission.name == :read && g.grantee.uri == "http://acs.amazonaws.com/groups/global/AllUsers"
+    end
+    return false
   end
 
   def pp(object)
@@ -71,16 +86,15 @@ class BucketSyncService
     return to_object.etag != object.etag # does the etag on the dst object differ from src?
   end
 
-  def get_bucket_reference(credentials)
+
+  def bucket_from_credentials(credentials)
     s3 = AWS::S3.new(access_key_id:      credentials[:aws_access_key_id],
                      secret_access_key:  credentials[:aws_secret_access_key])
 
     bucket = s3.buckets[ credentials[:bucket] ]
-    create_bucket_if_needed!(bucket)
-  end
-
-  def create_bucket_if_needed!(bucket)
-    return s3.buckets.create( credentials[:bucket] ) if !bucket.exists?
+    if !bucket.exists?
+      bucket = s3.buckets.create( credentials[:bucket] )
+    end
     bucket
   end
 end

@@ -20,7 +20,6 @@ Next you'll need to setup the config file:
 aws_access_key_id: ""
 aws_secret_access_key: ""
 aws_region: 'us-west-1'
-aws_master_username: ""
 aws_master_user_password: ""
 aws_production_bucket: "" # this bucket is read from
 aws_staging_bucket: ""    # this bucket is DELETED and written to!
@@ -166,7 +165,7 @@ That's commendable.  Use the below rules, replacing `PRODUCTIONDB` with the name
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release` to create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
-There's a couple unit tests with commented out method calls.  This was how I tested against amazon, simply uncomment a line, drop in a `binding.pry;exit!` and test/ debug what ever methods you think are messing up.  
+  There's a couple unit tests with commented out method calls.  This was how I tested against amazon, simply uncomment a line, drop in a `binding.pry;exit!` and test/ debug what ever methods you think are messing up.  Also, if you create the file config/aws_actual_fffing_secrets.yml, you can set the config variables that will be used throughout testing...  naturally, ensure such credentials never see the light of github.  
 
 
 ## Contributing
