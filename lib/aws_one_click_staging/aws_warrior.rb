@@ -44,7 +44,7 @@ module AwsOneClickStaging
 
     def get_fancy_string_of_staging_db_uri
       setup_aws_credentials_and_configs
-      
+
       l = 66
       msg = ""
       msg += "*" * l + "\n"
@@ -110,14 +110,19 @@ module AwsOneClickStaging
 
     def spawn_new_staging_db_instance!
       puts "Spawning a new fully clony RDS db instance for staging purposes"
-      response = @c.create_db_instance(db_instance_identifier: @db_instance_id_staging,
-        db_instance_class: "db.t1.micro",
-        engine: "postgres",
-        master_username: @master_username,
-        master_user_password: @master_user_password,
-        allocated_storage: "10")
+
+      @c.describe_db_snapshots(db_snapshot_identifier: @db_snapshot_id).db_snapshots.first
+
+      response = @c.restore_db_instance_from_db_snapshot(
+        db_instance_identifier: @db_instance_id_staging,
+        db_snapshot_identifier: @db_snapshot_id,
+        db_instance_class: "db.t1.micro"
+      )
 
       sleep 10 while get_fresh_db_instance_state(@db_instance_id_staging).db_instance_status != "available"
+
+      # disables automatic backups on the instance since it's a bit wasteful
+      response = @c.modify_db_instance(db_instance_identifier: @db_instance_id_staging, backup_retention_period: 0)
     end
 
 
