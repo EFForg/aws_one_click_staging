@@ -61,7 +61,6 @@ module AwsOneClickStaging
       aws_region = @config["aws_region"]
       @access_key_id = @config["aws_access_key_id"]
       @secret_access_key = @config["aws_secret_access_key"]
-      @master_username = @config["aws_master_username"]
       @master_user_password = @config["aws_master_user_password"]
       @aws_production_bucket = @config["aws_production_bucket"]
       @aws_staging_bucket = @config["aws_staging_bucket"]
@@ -119,10 +118,16 @@ module AwsOneClickStaging
         db_instance_class: "db.t1.micro"
       )
 
+
       sleep 10 while get_fresh_db_instance_state(@db_instance_id_staging).db_instance_status != "available"
 
-      # disables automatic backups on the instance since it's a bit wasteful
-      response = @c.modify_db_instance(db_instance_identifier: @db_instance_id_staging, backup_retention_period: 0)
+      # sets password for staging db and disables automatic backups
+      response = @c.modify_db_instance(
+        db_instance_identifier: @db_instance_id_staging,
+        backup_retention_period: 0,
+        master_user_password: @master_user_password
+      )
+      sleep 2 while get_fresh_db_instance_state(@db_instance_id_staging).db_instance_status != "available"
     end
 
 

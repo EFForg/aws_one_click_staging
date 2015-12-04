@@ -20,7 +20,6 @@ Next you'll need to setup the config file:
 aws_access_key_id: ""
 aws_secret_access_key: ""
 aws_region: 'us-west-1'
-aws_master_username: ""
 aws_master_user_password: ""
 aws_production_bucket: "" # this bucket is read from
 aws_staging_bucket: ""    # this bucket is DELETED and written to!
